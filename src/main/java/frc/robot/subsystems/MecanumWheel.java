@@ -26,6 +26,7 @@ public class MecanumWheel {
     public void log() {
         SmartDashboard.putNumber("MecanumWheel/Max Linear Velocity", getMaxLinearVelocity());
         SmartDashboard.putNumber("MecanumWheel/Velocity", getVelocity());
+        SmartDashboard.putNumber("Target Velocity", pidController.getSetpoint());
     }
 
     public double getVelocity() {
