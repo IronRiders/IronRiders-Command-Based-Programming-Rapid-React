@@ -49,6 +49,6 @@ public class RobotContainer {
         }
 
         public Command getAutonomousCommand() {
-                return autocmdFactory.fiveBallAuto();
+                return autocmdFactory.testAuto();
         }
 }
