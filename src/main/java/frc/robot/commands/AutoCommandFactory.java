@@ -70,7 +70,7 @@ public class AutoCommandFactory {
   // Tuning/Debugging New Auto Paths
 
   public Command testAuto() {
-    return autoPath("part 1", true);
+    return autoPath("Part 1", true);
   }
 
   public Command TuningThetaController180() {
