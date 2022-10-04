@@ -25,7 +25,7 @@ public class AutoCommandFactory {
   private final VisionSubsystem vision;
 
   public AutoCommandFactory(ShooterSubsystem shooter, DriveSubsystem drive, IntakeSubSystem intaker,
-      IndexerSubsystem indexer, VisionSubsystem vision) {
+    IndexerSubsystem indexer, VisionSubsystem vision) {
     this.shooter = shooter;
     this.drive = drive;
     this.intaker = intaker;
