@@ -11,10 +11,10 @@ public class IndexerSubsystem extends SubsystemBase {
     }
 
     public void extend() {
-        servo.set(Constants.INDEXER_EXTENSION);
+        servo.setAngle(Constants.INDEXER_EXTENSION);
     }
 
     public void retract() {
-        servo.set(0);
+        servo.setAngle(0);
     }
 }
