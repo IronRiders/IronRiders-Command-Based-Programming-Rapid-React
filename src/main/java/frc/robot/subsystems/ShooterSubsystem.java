@@ -21,6 +21,8 @@ public class ShooterSubsystem extends SubsystemBase {
         bottomPID = bottomMotor.getPIDController();
         topMotor.setInverted(true);
         bottomMotor.setInverted(true);
+        bottomMotor.enableVoltageCompensation(12);
+        topMotor.enableVoltageCompensation(12);
         topPID.setOutputRange(-1, 1);
         bottomPID.setOutputRange(-1, 1);
         bottomPID.setP(Constants.SHOOTER_P);
