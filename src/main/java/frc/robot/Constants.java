@@ -12,7 +12,7 @@ public final class Constants {
     public static final double TURN_SPEED = 1; // radians per second
 
     // Indexer
-    public static final double INDEXER_EXTENSION = 0.3;
+    public static final double INDEXER_EXTENSION = 20; // Degrees
 
     // Intake
     public static final double INTAKE_SPEED = 0.8;
