@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.*;
 import frc.robot.commands.*;
 import edu.wpi.first.wpilibj2.command.*;
@@ -19,6 +20,8 @@ public class RobotContainer {
         AutoCommandFactory autocmdFactory = new AutoCommandFactory(shooter, drive, intake, indexer, vision);
 
         public RobotContainer() {
+
+                SmartDashboard.putNumber("Shooter Offset RPM", 0);
 
                 drive.setDefaultCommand(new RunCommand(() -> drive.setChassisSpeeds(controller.getRawAxis(0),
                                 controller.getRawAxis(1), controller.getRawAxis(3), true), drive));

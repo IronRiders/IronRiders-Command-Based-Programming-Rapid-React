@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants; 
 
@@ -47,6 +48,6 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public static double distanceToRPM(double distance) {
-       return 1921.5 + (-3.0514 * distance) + (0.0262 * distance * distance);
+       return 1921.5 + (-3.0514 * distance) + (0.0262 * distance * distance) + SmartDashboard.getNumber("offset", 0);
     }
 }
