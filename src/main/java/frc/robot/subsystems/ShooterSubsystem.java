@@ -1,4 +1,5 @@
 package frc.robot.subsystems;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
@@ -7,12 +8,12 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants; 
+import frc.robot.Constants;
 
 public class ShooterSubsystem extends SubsystemBase {
     private CANSparkMax bottomMotor, topMotor;
     private SparkMaxPIDController topPID, bottomPID;
-    
+
     public ShooterSubsystem() {
         bottomMotor = new CANSparkMax(Constants.SHOOTER_PORT_BOTTOM, MotorType.kBrushless);
         topMotor = new CANSparkMax(Constants.SHOOTER_PORT_TOP, MotorType.kBrushless);
@@ -41,13 +42,14 @@ public class ShooterSubsystem extends SubsystemBase {
         topPID.setReference(rpm * Constants.SHOOTER_TOP_MOTOR_CHANGE, ControlType.kVelocity);
         bottomPID.setReference(rpm, ControlType.kVelocity);
     }
-    
+
     public void stop() {
         topPID.setReference(0, ControlType.kVelocity);
         bottomPID.setReference(0, ControlType.kVelocity);
     }
 
     public static double distanceToRPM(double distance) {
-       return 1921.5 + (-3.0514 * distance) + (0.0262 * distance * distance) + SmartDashboard.getNumber("Shooter Offset RPM", 0);
+        return 1921.5 + (-3.0514 * distance) + (0.0262 * distance * distance)
+                + SmartDashboard.getNumber("Shooter Offset RPM", 0);
     }
 }

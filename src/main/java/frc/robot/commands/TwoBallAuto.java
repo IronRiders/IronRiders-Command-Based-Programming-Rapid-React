@@ -12,15 +12,16 @@ import frc.robot.subsystems.VisionSubsystem;
 
 public class TwoBallAuto extends SequentialCommandGroup {
 
-    public TwoBallAuto(DriveSubsystem drive, VisionSubsystem vision, ShooterSubsystem shooter, IndexerSubsystem indexer, IntakeSubSystem intake) {
+    public TwoBallAuto(DriveSubsystem drive, VisionSubsystem vision, ShooterSubsystem shooter, IndexerSubsystem indexer,
+            IntakeSubSystem intake) {
 
         addCommands(
-            new RunCommand(() -> {
-            drive.setChassisSpeeds(0, Constants.DRIVE_SPEED_AUTO, 0, false);
-            intake.intakeBall();
-        }, drive).withTimeout(2.5),
-        new InstantCommand(drive::stop, drive),
-        new ShooterTeleop(shooter,indexer,vision,drive));
+                new RunCommand(() -> {
+                    drive.setChassisSpeeds(0, Constants.DRIVE_SPEED_AUTO, 0, false);
+                    intake.intakeBall();
+                }, drive).withTimeout(2.5),
+                new InstantCommand(drive::stop, drive),
+                new ShooterTeleop(shooter, indexer, vision, drive));
     }
-    
+
 }
