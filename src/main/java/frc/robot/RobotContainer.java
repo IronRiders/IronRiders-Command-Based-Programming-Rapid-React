@@ -5,6 +5,7 @@ import frc.robot.subsystems.*;
 import frc.robot.commands.*;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class RobotContainer {
     public final VisionSubsystem vision = new VisionSubsystem();
@@ -48,5 +49,18 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return null;
+    }
+
+    // This adds a deadzone and nonlinear response to the joystick axis
+    private double joystickResponse(double raw) {
+        double deadband = SmartDashboard.getNumber("deadband", Constants.DEADBAND);
+        double deadbanded = 0.0;
+        if (raw > deadband) {
+            deadbanded = (raw - deadband) / (1 - deadband);
+        } else if (raw < -deadband) {
+            deadbanded = (raw + deadband) / (1 - deadband);
+        }
+        double exponent = SmartDashboard.getNumber("exponent", Constants.EXPONENT) + 1;
+        return Math.pow(Math.abs(deadbanded), exponent) * Math.signum(deadbanded);
     }
 }
