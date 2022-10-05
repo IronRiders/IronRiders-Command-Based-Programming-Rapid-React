@@ -19,6 +19,8 @@ import frc.robot.Constants;
 
 public class DriveSubsystem extends SubsystemBase {
     private boolean inverted;
+    private ChassisSpeeds ActualChassisSpeeds;
+    private ChassisSpeeds targetChassisSpeeds;
     private MecanumWheel[] motors = new MecanumWheel[4];
     private final MecanumDriveKinematics kinematics;
     private final MecanumDriveOdometry odometry;
@@ -47,7 +49,7 @@ public class DriveSubsystem extends SubsystemBase {
 
         navx = new AHRS();
         odometry = new MecanumDriveOdometry(kinematics, new Rotation2d());
-        thetaController.enableContinuousInput(-180, 180); // For more efficiency when turning.
+        thetaController.enableContinuousInput(-Math.PI, Math.PI); // For more efficiency when turning.
     }
 
     public void invertDrive() {
@@ -72,6 +74,16 @@ public class DriveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("y Controller (target)", xController.getSetpoint());
         SmartDashboard.putNumber("Theta controller (Degrees)", getPose2d().getRotation().getDegrees());
         SmartDashboard.putNumber("Theta setPoint (Target))", Math.toDegrees(thetaController.getSetpoint().position));
+
+        ActualChassisSpeeds = kinematics.toChassisSpeeds(getWheelSpeeds());
+
+        SmartDashboard.putNumber("Drive/VX", ActualChassisSpeeds.vxMetersPerSecond);
+        SmartDashboard.putNumber("Drive/VY", ActualChassisSpeeds.vyMetersPerSecond);
+        SmartDashboard.putNumber("Drive/Omega Degrees", Units.radiansToDegrees(ActualChassisSpeeds.omegaRadiansPerSecond));
+
+        SmartDashboard.putNumber("Drive/Target VX", targetChassisSpeeds.vxMetersPerSecond);
+        SmartDashboard.putNumber("Drive/Target VY", targetChassisSpeeds.vyMetersPerSecond);
+        SmartDashboard.putNumber("Drive/Target Omega Degrees", Units.radiansToDegrees(targetChassisSpeeds.omegaRadiansPerSecond));
     }
 
     public Pose2d getPose2d() {
@@ -90,6 +102,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
+        targetChassisSpeeds = chassisSpeeds;
         SetWheelSpeeds(kinematics.toWheelSpeeds(chassisSpeeds));
     }
 
