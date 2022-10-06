@@ -19,8 +19,8 @@ public class RobotContainer {
 
     public RobotContainer() {
         // Drive
-        drive.setDefaultCommand(new RunCommand(() -> drive.updateSpeed(controller.getRawAxis(0),
-                controller.getRawAxis(1), controller.getRawAxis(3), true), drive));
+        drive.setDefaultCommand(new RunCommand(() -> drive.updateSpeed(joystickResponse(controller.getRawAxis(0)),
+                joystickResponse(controller.getRawAxis(1)), joystickResponse(controller.getRawAxis(3)), true), drive));
 
         new JoystickButton(controller, 1)
                 .whenHeld(new ShooterTeleop(shooter, indexer, vision, drive));

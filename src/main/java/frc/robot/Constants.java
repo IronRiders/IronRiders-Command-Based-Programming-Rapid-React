@@ -9,7 +9,7 @@ public final class Constants {
     public static final double TURN_SPEED = 1; // radians per second
 
     // Indexer
-    public static final double INDEXER_EXTENSION = 20; // Degrees
+    public static final double INDEXER_EXTENSION = 40; // Degrees
 
     // Intake
     public static final double INTAKE_SPEED = 0.8;
@@ -60,7 +60,7 @@ public final class Constants {
     public static final double VISION_DELTA_HEIGHT = 104 - 20; // target - camera
 
     // Joystick
-    public static final double DEADBAND = 0.05;
+    public static final double DEADBAND = 0.07;
     public static final double EXPONENT = 0.0; // between 0 and 1
 
     // Climber
