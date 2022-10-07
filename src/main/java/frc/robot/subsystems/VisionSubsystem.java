@@ -36,6 +36,7 @@ public class VisionSubsystem extends SubsystemBase {
         double degrees = Constants.VISION_CAMERA_ANGLE + getYAngleOffset();
         // https://docs.limelightvision.io/en/latest/cs_estimating_distance.html
         double distance = Constants.VISION_DELTA_HEIGHT / Math.tan(degrees * Math.PI / 180.0);
+        SmartDashboard.putBoolean("in shooter range", (distance < 165 && distance > 85));
         return distance;
     }
 

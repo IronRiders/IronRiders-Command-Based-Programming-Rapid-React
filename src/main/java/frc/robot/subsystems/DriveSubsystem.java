@@ -7,6 +7,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants; 
 
 public class DriveSubsystem extends SubsystemBase {
@@ -43,6 +44,14 @@ public class DriveSubsystem extends SubsystemBase {
 
     public void invertDrive() {
         inverted = !inverted;
+    }
+
+    @Override
+    public void periodic() {
+        // This method will be called once per scheduler run
+        super.periodic();
+
+        SmartDashboard.putBoolean("isInverted", inverted);
     }
 
     public void updateSpeed(double strafe, double drive, double turn, boolean useInverted) {

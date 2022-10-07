@@ -22,6 +22,8 @@ public class RobotContainer {
         drive.setDefaultCommand(new RunCommand(() -> drive.updateSpeed(joystickResponse(controller.getRawAxis(0)),
                 joystickResponse(controller.getRawAxis(1)), joystickResponse(controller.getRawAxis(3)), true), drive));
 
+        shooter.setDefaultCommand(new RunCommand(() -> shooter.shoot(50), shooter));
+
         new JoystickButton(controller, 1)
                 .whenHeld(new ShooterTeleop(shooter, indexer, vision, drive));
 
@@ -48,7 +50,7 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return null;
+            return CommandFactory.TwoBallAuto(drive, vision, shooter, indexer, intake);
     }
 
     // This adds a deadzone and nonlinear response to the joystick axis
