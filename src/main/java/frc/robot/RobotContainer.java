@@ -26,7 +26,7 @@ public class RobotContainer {
 
         drive.setDefaultCommand(new RunCommand(() -> drive.setChassisSpeeds(controller.getRawAxis(0),
                 controller.getRawAxis(1), controller.getRawAxis(3), true), drive));
-        // shooter.setDefaultCommand(new RunCommand(() -> shooter.shoot(100), shooter));
+        shooter.setDefaultCommand(new RunCommand(() -> shooter.shoot(50), shooter));
         // Add if servo is working
 
         new JoystickButton(controller, 1)

@@ -79,11 +79,13 @@ public class DriveSubsystem extends SubsystemBase {
 
         SmartDashboard.putNumber("Drive/VX", ActualChassisSpeeds.vxMetersPerSecond);
         SmartDashboard.putNumber("Drive/VY", ActualChassisSpeeds.vyMetersPerSecond);
-        SmartDashboard.putNumber("Drive/Omega Degrees", Units.radiansToDegrees(ActualChassisSpeeds.omegaRadiansPerSecond));
+        SmartDashboard.putNumber("Drive/Omega Degrees",
+                Units.radiansToDegrees(ActualChassisSpeeds.omegaRadiansPerSecond));
 
         SmartDashboard.putNumber("Drive/Target VX", targetChassisSpeeds.vxMetersPerSecond);
         SmartDashboard.putNumber("Drive/Target VY", targetChassisSpeeds.vyMetersPerSecond);
-        SmartDashboard.putNumber("Drive/Target Omega Degrees", Units.radiansToDegrees(targetChassisSpeeds.omegaRadiansPerSecond));
+        SmartDashboard.putNumber("Drive/Target Omega Degrees",
+                Units.radiansToDegrees(targetChassisSpeeds.omegaRadiansPerSecond));
     }
 
     public Pose2d getPose2d() {
