@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import com.kauailabs.navx.frc.AHRS;
+import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -24,7 +24,7 @@ public class DriveSubsystem extends SubsystemBase {
     private MecanumWheel[] motors = new MecanumWheel[4];
     private final MecanumDriveKinematics kinematics;
     private final MecanumDriveOdometry odometry;
-    private final AHRS navx;
+    private final WPI_Pigeon2 pigeon;
 
     private static ProfiledPIDController thetaController = new ProfiledPIDController(Constants.AUTO_THETACONTROLLER_KP,
             0, 0,
@@ -47,7 +47,7 @@ public class DriveSubsystem extends SubsystemBase {
                 new Translation2d(-0.28575, 0.2267),
                 new Translation2d(-0.28575, -0.2267));
 
-        navx = new AHRS();
+                pigeon = new WPI_Pigeon2(0);
         odometry = new MecanumDriveOdometry(kinematics, new Rotation2d());
         thetaController.enableContinuousInput(-Math.PI, Math.PI); // For more efficiency when turning.
     }
@@ -67,7 +67,7 @@ public class DriveSubsystem extends SubsystemBase {
     public void periodic() {
         // Tuning
         NetworkTableInstance.getDefault().flush();
-        odometry.update(navx.getRotation2d(), getWheelSpeeds());
+        odometry.update(pigeon.getRotation2d(), getWheelSpeeds());
         SmartDashboard.putNumber("x controller", getPose2d().getX());
         SmartDashboard.putNumber("x Controller (target)", yController.getSetpoint());
         SmartDashboard.putNumber("Y controller", getPose2d().getY());
@@ -139,7 +139,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     public void resetOdometry(Pose2d pose2d) {
-        odometry.resetPosition(pose2d, navx.getRotation2d());
+        odometry.resetPosition(pose2d, pigeon.getRotation2d());
     }
 
     public ProfiledPIDController getThetaController() {
