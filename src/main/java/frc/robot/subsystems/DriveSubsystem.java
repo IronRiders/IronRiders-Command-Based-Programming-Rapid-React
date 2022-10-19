@@ -49,6 +49,7 @@ public class DriveSubsystem extends SubsystemBase {
 
                 pigeon = new WPI_Pigeon2(15);
         odometry = new MecanumDriveOdometry(kinematics, new Rotation2d());
+        targetChassisSpeeds = new ChassisSpeeds();
         thetaController.enableContinuousInput(-Math.PI, Math.PI); // For more efficiency when turning.
     }
 
