@@ -6,7 +6,6 @@ import frc.robot.subsystems.*;
 import frc.robot.commands.*;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class RobotContainer {
     public final VisionSubsystem vision = new VisionSubsystem();
@@ -24,8 +23,8 @@ public class RobotContainer {
 
         SmartDashboard.putNumber("Shooter Offset RPM", 0);
 
-        drive.setDefaultCommand(new RunCommand(() -> drive.setChassisSpeeds(controller.getRawAxis(0),
-                controller.getRawAxis(1), controller.getRawAxis(3), true), drive));
+        drive.setDefaultCommand(new RunCommand(() -> drive.setChassisSpeeds(joystickResponse(controller.getRawAxis(0)),
+                joystickResponse(controller.getRawAxis(1)), joystickResponse(controller.getRawAxis(3)), true), drive));
         shooter.setDefaultCommand(new RunCommand(() -> shooter.shoot(50), shooter));
         // Add if servo is working
 
@@ -55,7 +54,7 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return autocmdFactory.testAuto();
+        return autocmdFactory.TuningThetaController90();
     }
 
     // This adds a deadzone and nonlinear response to the joystick axis
