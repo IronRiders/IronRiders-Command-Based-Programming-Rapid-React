@@ -26,11 +26,11 @@ public class DriveSubsystem extends SubsystemBase {
     private final MecanumDriveOdometry odometry;
     private final WPI_Pigeon2 pigeon;
 
-    private static ProfiledPIDController thetaController = new ProfiledPIDController(8,
+    private static ProfiledPIDController thetaController = new ProfiledPIDController(9,
             0, 0,
             new TrapezoidProfile.Constraints(Units.rotationsToRadians(0.75), Units.rotationsToRadians(1.5)));
-    private static PIDController xController = new PIDController(Constants.AUTO_POSITION_KP, 0, 0);
-    private static PIDController yController = new PIDController(Constants.AUTO_POSITION_KP, 0, 0);
+    private static PIDController xController = new PIDController(0, 0, 0);
+    private static PIDController yController = new PIDController(0, 0, 0);
 
     public DriveSubsystem() {
 
@@ -73,7 +73,7 @@ public class DriveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("x Controller (target)", yController.getSetpoint());
         SmartDashboard.putNumber("Y controller", getPose2d().getY());
         SmartDashboard.putNumber("y Controller (target)", xController.getSetpoint());
-        SmartDashboard.putNumber("Theta controller (Degrees)", getPose2d().getRotation().getDegrees());
+        SmartDashboard.putNumber("Theta controller (Degrees)", pigeon.getRotation2d().getDegrees());
         SmartDashboard.putNumber("Theta setPoint (Target))", Math.toDegrees(thetaController.getSetpoint().position));
 
         ActualChassisSpeeds = kinematics.toChassisSpeeds(getWheelSpeeds());
