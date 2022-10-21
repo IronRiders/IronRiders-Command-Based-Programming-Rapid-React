@@ -26,7 +26,7 @@ public class DriveSubsystem extends SubsystemBase {
     private final MecanumDriveOdometry odometry;
     private final WPI_Pigeon2 pigeon;
 
-    private static ProfiledPIDController thetaController = new ProfiledPIDController(Constants.AUTO_THETACONTROLLER_KP,
+    private static ProfiledPIDController thetaController = new ProfiledPIDController(8,
             0, 0,
             new TrapezoidProfile.Constraints(Units.rotationsToRadians(0.75), Units.rotationsToRadians(1.5)));
     private static PIDController xController = new PIDController(Constants.AUTO_POSITION_KP, 0, 0);
