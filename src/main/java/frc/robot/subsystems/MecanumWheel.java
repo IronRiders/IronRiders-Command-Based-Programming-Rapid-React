@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -19,6 +20,7 @@ public class MecanumWheel {
         motor = new CANSparkMax(motorId, MotorType.kBrushless);
         motor.setInverted(inverted);
         motor.setSmartCurrentLimit(Constants.DRIVE_CURRENT_LIMIT);
+        motor.setIdleMode(IdleMode.kBrake);
         encoder = motor.getEncoder();
         pidController = new PIDController(Constants.AUTO_WHEELPID_KP, 0.0, 0.0);
     }
@@ -30,7 +32,7 @@ public class MecanumWheel {
     }
 
     public double getVelocity() {
-        return (encoder.getVelocity() / 60 * Constants.wheel_circumference);
+        return (encoder.getVelocity() / 4 / 60 * Constants.wheel_circumference);
     }
 
     public void setVelocity(double mps) {

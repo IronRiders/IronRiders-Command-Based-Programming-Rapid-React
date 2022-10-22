@@ -4,7 +4,6 @@ import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
@@ -25,12 +24,11 @@ public class DriveSubsystem extends SubsystemBase {
     private final MecanumDriveKinematics kinematics;
     private final MecanumDriveOdometry odometry;
     private final WPI_Pigeon2 pigeon;
-
-    private static ProfiledPIDController thetaController = new ProfiledPIDController(9,
+    private static ProfiledPIDController thetaController = new ProfiledPIDController(Constants.AUTO_THETACONTROLLER_KP,
             0, 0,
             new TrapezoidProfile.Constraints(Units.rotationsToRadians(0.75), Units.rotationsToRadians(1.5)));
-    private static PIDController xController = new PIDController(0, 0, 0);
-    private static PIDController yController = new PIDController(0, 0, 0);
+    private static PIDController xController = new PIDController(Constants.AUTO_POSITION_KP, 0, 0);
+    private static PIDController yController = new PIDController(Constants.AUTO_POSITION_KP, 0, 0);
 
     public DriveSubsystem() {
 
@@ -47,8 +45,8 @@ public class DriveSubsystem extends SubsystemBase {
                 new Translation2d(-0.28575, 0.2267),
                 new Translation2d(-0.28575, -0.2267));
 
-                pigeon = new WPI_Pigeon2(15);
-        odometry = new MecanumDriveOdometry(kinematics, new Rotation2d());
+        pigeon = new WPI_Pigeon2(15);
+        odometry = new MecanumDriveOdometry(kinematics, pigeon.getRotation2d());
         targetChassisSpeeds = new ChassisSpeeds();
         thetaController.enableContinuousInput(-Math.PI, Math.PI); // For more efficiency when turning.
     }
@@ -70,10 +68,10 @@ public class DriveSubsystem extends SubsystemBase {
         NetworkTableInstance.getDefault().flush();
         odometry.update(pigeon.getRotation2d(), getWheelSpeeds());
         SmartDashboard.putNumber("x controller", getPose2d().getX());
-        SmartDashboard.putNumber("x Controller (target)", yController.getSetpoint());
+        SmartDashboard.putNumber("x Controller (target)", xController.getSetpoint());
         SmartDashboard.putNumber("Y controller", getPose2d().getY());
-        SmartDashboard.putNumber("y Controller (target)", xController.getSetpoint());
-        SmartDashboard.putNumber("Theta controller (Degrees)", pigeon.getRotation2d().getDegrees());
+        SmartDashboard.putNumber("y Controller (target)", yController.getSetpoint());
+        SmartDashboard.putNumber("Theta controller (Degrees)", getPose2d().getRotation().getDegrees());
         SmartDashboard.putNumber("Theta setPoint (Target))", Math.toDegrees(thetaController.getSetpoint().position));
 
         ActualChassisSpeeds = kinematics.toChassisSpeeds(getWheelSpeeds());
