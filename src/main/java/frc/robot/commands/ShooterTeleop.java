@@ -14,8 +14,8 @@ public class ShooterTeleop extends SequentialCommandGroup {
         addCommands(
                 new RunCommand(() -> {
                     drive.setChassisSpeeds(0, 0, vision.steeringAssist(), false);
-                    shooter.shoot(100);
-                }, drive, shooter, vision).withTimeout(1.5),
+                    shooter.shoot(ShooterSubsystem.distanceToRPM(vision.estimateDistance()));
+                }, drive, shooter, vision).withTimeout(0.4),
                 new InstantCommand(drive::stop, drive),
                 CommandFactory.runIndexerCommand(indexer));
     }
