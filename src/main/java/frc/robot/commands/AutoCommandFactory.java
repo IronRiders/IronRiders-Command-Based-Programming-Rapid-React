@@ -48,28 +48,24 @@ public class AutoCommandFactory {
   public SequentialCommandGroup fiveBallAuto() {
 
     return new SequentialCommandGroup(
-       // new ParallelDeadlineGroup(
+        new ParallelDeadlineGroup(
             autoPath("FiveBall1", true),
-            new WaitCommand(1),
-            //new RunCommand(intaker::intakeBall, intaker)),
-      //  new ShooterTeleop(shooter, indexer, vision, drive),
+            new RunCommand(intaker::intakeBall, intaker)),
+       new ShooterTeleop(shooter, indexer, vision, drive),
 
-       // new ParallelDeadlineGroup(
+        new ParallelDeadlineGroup(
             autoPath("FiveBall2", false),
-            new WaitCommand(1),
-         //   new RunCommand(intaker::intakeBall, intaker)),
+            new RunCommand(intaker::intakeBall, intaker)),
 
         autoPath("FiveBall3", false),
-        new WaitCommand(5),
-       // new ShooterTeleop(shooter, indexer, vision, drive),
+       new ShooterTeleop(shooter, indexer, vision, drive),
 
-      //  new ParallelDeadlineGroup(
+        new ParallelDeadlineGroup(
             autoPath("FiveBall4", false),
-            new WaitCommand(1),
-        //    new RunCommand(intaker::intakeBall, intaker)),
+           new RunCommand(intaker::intakeBall, intaker)),
 
-        autoPath("FiveBall5", false));
-      //  new ShooterTeleop(shooter, indexer, vision, drive));
+        autoPath("FiveBall5", false),
+       new ShooterTeleop(shooter, indexer, vision, drive));
   }
 
   // Tuning/Debugging New Auto Paths
