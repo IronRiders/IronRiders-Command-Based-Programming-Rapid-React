@@ -54,7 +54,11 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return autocmdFactory.testAuto();
+        return autocmdFactory.fiveBallAuto();
+    }
+
+    public void traj() {
+         SmartDashboard.putData("field", drive.field);
     }
 
     // This adds a deadzone and nonlinear response to the joystick axis

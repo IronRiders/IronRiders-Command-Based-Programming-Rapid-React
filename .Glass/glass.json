@@ -15,6 +15,9 @@
       "/LiveWindow/Ungrouped/navX-Sensor[4]": "Gyro"
     }
   },
+  "NetworkTables Log": {
+    "visible": true
+  },
   "NetworkTables Settings": {
     "mode": "Client",
     "serverTeam": "localhost"

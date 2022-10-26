@@ -4,6 +4,7 @@ import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
@@ -12,6 +13,7 @@ import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -24,6 +26,7 @@ public class DriveSubsystem extends SubsystemBase {
     private final MecanumDriveKinematics kinematics;
     private final MecanumDriveOdometry odometry;
     private final WPI_Pigeon2 pigeon;
+    public final Field2d field;
     private static ProfiledPIDController thetaController = new ProfiledPIDController(Constants.AUTO_THETACONTROLLER_KP,
             0, 0,
             new TrapezoidProfile.Constraints(Units.rotationsToRadians(0.75), Units.rotationsToRadians(1.5)));
@@ -49,6 +52,7 @@ public class DriveSubsystem extends SubsystemBase {
         odometry = new MecanumDriveOdometry(kinematics, pigeon.getRotation2d());
         targetChassisSpeeds = new ChassisSpeeds();
         thetaController.enableContinuousInput(-Math.PI, Math.PI); // For more efficiency when turning.
+        field = new Field2d();
     }
 
     public void invertDrive() {
@@ -85,6 +89,12 @@ public class DriveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Drive/Target VY", targetChassisSpeeds.vyMetersPerSecond);
         SmartDashboard.putNumber("Drive/Target Omega Degrees",
                 Units.radiansToDegrees(targetChassisSpeeds.omegaRadiansPerSecond));
+
+        field.getObject("Target").setPose(
+                new Pose2d(
+                        xController.getSetpoint(),
+                        yController.getSetpoint(),
+                        new Rotation2d(thetaController.getSetpoint().position)));
     }
 
     public Pose2d getPose2d() {

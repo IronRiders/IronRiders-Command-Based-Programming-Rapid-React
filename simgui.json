@@ -27,7 +27,21 @@
       "/LiveWindow/Ungrouped/Pigeon 2 [15]": "Gyro",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
       "/LiveWindow/Ungrouped/navX-Sensor[4]": "Gyro",
-      "/LiveWindow/VisionSubsystem": "Subsystem"
+      "/LiveWindow/VisionSubsystem": "Subsystem",
+      "/SmartDashboard/field": "Field2d"
+    },
+    "windows": {
+      "/SmartDashboard/field": {
+        "image": "C:\\Users\\Anish\\Downloads\\2022-RapidReact.png",
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables": {
+    "LiveWindow": {
+      "open": true
     }
   }
 }
