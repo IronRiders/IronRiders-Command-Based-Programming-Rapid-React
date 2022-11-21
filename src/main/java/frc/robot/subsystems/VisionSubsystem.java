@@ -1,21 +1,43 @@
 package frc.robot.subsystems;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.photonvision.PhotonCamera;
+
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.I2C.Port;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.AprilTagFieldLayout;
 import frc.robot.Constants;
 
 public class VisionSubsystem extends SubsystemBase {
     private NetworkTable table;
     private PIDController pidController;
+    private PhotonCamera camera;
+    private AprilTagFieldLayout tagLayout;
 
     public VisionSubsystem() {
         table = NetworkTableInstance.getDefault().getTable("limelight");
         pidController = new PIDController(Constants.TURN_P, 0.0, 0.0);
         pidController.setSetpoint(0);
         pidController.setTolerance(Constants.TURN_TOLERANCE);
+
+        // April Tag
+        camera = new PhotonCamera("DefaultName");
+        try {
+            tagLayout = new AprilTagFieldLayout("AprilTags_RapidReact.json");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public double getXAngleOffset() {
@@ -59,6 +81,20 @@ public class VisionSubsystem extends SubsystemBase {
         adjustment = Math.min(Constants.TURN_MAX_SPEED, Math.max(-Constants.TURN_MAX_SPEED, adjustment));
         adjustment = pidController.atSetpoint() ? 0 : -adjustment;
         return adjustment;
+    }
+
+    public void aprilTag() {
+        var result = camera.getLatestResult();
+        boolean hasTargets = result.hasTargets();
+        var targets = result.getTargets();
+        List<Pose3d> robotPoses = new ArrayList<>();
+
+        for (var target : targets) {
+            var tag = tagLayout.getTagPose(target.getFiducialId()).get();
+            robotPoses.add(tag);
+            Transform3d bestPose = target.getBestCameraToTarget();
+            var camPose = tag.transformBy(bestPose.inverse());
+        }
     }
 
     @Override
