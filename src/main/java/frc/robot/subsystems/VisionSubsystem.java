@@ -8,7 +8,10 @@ import org.photonvision.PhotonCamera;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -21,6 +24,8 @@ public class VisionSubsystem extends SubsystemBase {
     private PIDController pidController;
     private PhotonCamera camera;
     private AprilTagFieldLayout tagLayout;
+    private List<Pose3d> targetPoses;
+    private List<Pose3d> robotPoses;
 
     public VisionSubsystem() {
         table = NetworkTableInstance.getDefault().getTable("limelight");
@@ -30,6 +35,8 @@ public class VisionSubsystem extends SubsystemBase {
 
         // April Tag
         camera = new PhotonCamera("DefaultName");
+        robotPoses = new ArrayList<>();
+        targetPoses = new ArrayList<>();
         try {
             tagLayout = new AprilTagFieldLayout("AprilTags_RapidReact.json");
         } catch (IOException e) {
@@ -82,16 +89,26 @@ public class VisionSubsystem extends SubsystemBase {
 
     public void aprilTag() {
         var result = camera.getLatestResult();
-        boolean hasTargets = result.hasTargets();
         var targets = result.getTargets();
-        List<Pose3d> robotPoses = new ArrayList<>();
 
         for (var target : targets) {
             var tag = tagLayout.getTagPose(target.getFiducialId()).get();
-            robotPoses.add(tag);
+            targetPoses.add(tag);
             Transform3d bestPose = target.getBestCameraToTarget();
             var camPose = tag.transformBy(bestPose.inverse());
+            robotPoses.add(camPose.transformBy(new Transform3d(
+                    new Translation3d(Units.inchesToMeters(16), Units.inchesToMeters(18.68),
+                            Units.inchesToMeters(18.5)),
+                    new Rotation3d(0, Math.toRadians(20), 0))));
         }
+    }
+
+    public List<Pose3d> getTagPoses() {
+        return targetPoses;
+    }
+
+    public List<Pose3d> getRobotPoses() {
+        return robotPoses;
     }
 
     @Override

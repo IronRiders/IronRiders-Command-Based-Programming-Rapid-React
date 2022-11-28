@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.util.stream.Collectors;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.*;
@@ -59,6 +61,8 @@ public class RobotContainer {
 
     public void traj() {
          SmartDashboard.putData("field", drive.field);
+         drive.field.getObject("bestPoses").setPoses(vision.getRobotPoses().stream().map(p -> p.toPose2d()).collect(Collectors.toList()));
+         drive.field.getObject("targetPoses").setPoses(vision.getTagPoses().stream().map(p -> p.toPose2d()).collect(Collectors.toList()));
     }
 
     // This adds a deadzone and nonlinear response to the joystick axis
