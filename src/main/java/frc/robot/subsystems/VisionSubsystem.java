@@ -97,9 +97,9 @@ public class VisionSubsystem extends SubsystemBase {
             Transform3d bestPose = target.getBestCameraToTarget();
             var camPose = tag.transformBy(bestPose.inverse());
             robotPoses.add(camPose.transformBy(new Transform3d(
-                    new Translation3d(Units.inchesToMeters(16), Units.inchesToMeters(18.68),
+                    new Translation3d(-Units.inchesToMeters(16), -Units.inchesToMeters(18.68),
                             Units.inchesToMeters(18.5)),
-                    new Rotation3d(0, Math.toRadians(20), 0))));
+                    new Rotation3d(0, Math.toRadians(20), Math.toRadians(180)))));
         }
     }
 
