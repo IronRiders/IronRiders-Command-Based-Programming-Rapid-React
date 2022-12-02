@@ -1,18 +1,34 @@
 package frc.robot.subsystems;
 
+import java.util.List;
+
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+
+import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
+
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.estimator.MecanumDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
-import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -24,17 +40,25 @@ public class DriveSubsystem extends SubsystemBase {
     private ChassisSpeeds targetChassisSpeeds;
     private MecanumWheel[] motors = new MecanumWheel[4];
     private final MecanumDriveKinematics kinematics;
-    private final MecanumDriveOdometry odometry;
     private final WPI_Pigeon2 pigeon;
-    public final Field2d field;
+    public Field2d field;
     private static ProfiledPIDController thetaController = new ProfiledPIDController(Constants.AUTO_THETACONTROLLER_KP,
             0, 0,
             new TrapezoidProfile.Constraints(Units.rotationsToRadians(0.75), Units.rotationsToRadians(1.5)));
     private static PIDController xController = new PIDController(Constants.AUTO_POSITION_KP, 0, 0);
     private static PIDController yController = new PIDController(Constants.AUTO_POSITION_KP, 0, 0);
 
-    public DriveSubsystem() {
+    private final MecanumDrivePoseEstimator poseEstimator;
+    private static final Matrix<N3, N1> stateStdDevs = VecBuilder.fill(0, 0, Units.degreesToRadians(0));
+    private static final Matrix<N1, N1> localMeasurementStdDevs = VecBuilder.fill(Units.degreesToRadians(0));
+    private static final Matrix<N3, N1> visionMeasurementStdDevs = VecBuilder.fill(0, 0, Units.degreesToRadians(0));
+    private final PhotonCamera camera = new PhotonCamera("Camera Name");
+    private PhotonPipelineResult previousPipelineResult = null;
 
+    private static final List<Pose3d> allTargetPoses = List.of(
+            new Pose3d(new Translation3d(-0.0035306, 7.578928199999999, .8858503999999999), (new Rotation3d(0, 0, 0))));
+
+    public DriveSubsystem() {
         motors[0] = new MecanumWheel(Constants.WHEEL_PORT_FRONT_LEFT, true);
         motors[1] = new MecanumWheel(Constants.WHEEL_PORT_FRONT_RIGHT, false);
         motors[2] = new MecanumWheel(Constants.WHEEL_PORT_REAR_LEFT, true);
@@ -49,9 +73,15 @@ public class DriveSubsystem extends SubsystemBase {
                 new Translation2d(-0.28575, -0.2267));
 
         pigeon = new WPI_Pigeon2(15);
-        odometry = new MecanumDriveOdometry(kinematics, pigeon.getRotation2d());
         targetChassisSpeeds = new ChassisSpeeds();
         thetaController.enableContinuousInput(-Math.PI, Math.PI); // For more efficiency when turning.
+        field = new Field2d();
+
+        poseEstimator = new MecanumDrivePoseEstimator(
+                pigeon.getRotation2d(),
+                new Pose2d(),
+                getKinematics(), stateStdDevs,
+                localMeasurementStdDevs, visionMeasurementStdDevs);
         field = new Field2d();
     }
 
@@ -68,9 +98,42 @@ public class DriveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+
+        // Update pose estimator with visible targets
+        var pipelineResult = camera.getLatestResult();
+
+        if (!pipelineResult.equals(previousPipelineResult) && pipelineResult.hasTargets()) {
+            previousPipelineResult = pipelineResult;
+            double imageCaptureTime = Timer.getFPGATimestamp() - (pipelineResult.getLatencyMillis() / 1000d);
+
+            for (PhotonTrackedTarget target : pipelineResult.getTargets()) {
+
+                var fiducialId = target.getFiducialId();
+                if (fiducialId >= 0 && fiducialId < allTargetPoses.size()) {
+                    var targetPose = allTargetPoses.get(fiducialId);
+
+                    Transform3d camToTarget = target.getBestCameraToTarget();
+                    Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
+
+                    Pose3d visionMeasurement = camPose.transformBy(new Transform3d(
+                            new Translation3d(-Units.inchesToMeters(16), -Units.inchesToMeters(18.68),
+                                    Units.inchesToMeters(18.5)),
+                            new Rotation3d(0, Math.toRadians(20), Math.toRadians(180))));
+                    poseEstimator.addVisionMeasurement(visionMeasurement.toPose2d(), imageCaptureTime);
+                }
+            }
+            // Update pose estimator with drivetrain sensors
+            poseEstimator.updateWithTime(
+                    Timer.getFPGATimestamp(),
+                    pigeon.getRotation2d(),
+                    getWheelSpeeds());
+
+            field.setRobotPose(getPose2d());
+        }
+
         // Tuning
         NetworkTableInstance.getDefault().flush();
-        odometry.update(pigeon.getRotation2d(), getWheelSpeeds());
+        poseEstimator.update(pigeon.getRotation2d(), getWheelSpeeds());
         SmartDashboard.putNumber("x controller", getPose2d().getX());
         SmartDashboard.putNumber("x Controller (target)", xController.getSetpoint());
         SmartDashboard.putNumber("Y controller", getPose2d().getY());
@@ -98,7 +161,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     public Pose2d getPose2d() {
-        return odometry.getPoseMeters();
+        return poseEstimator.getEstimatedPosition();
     }
 
     public MecanumDriveKinematics getKinematics() {
@@ -148,7 +211,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     public void resetOdometry(Pose2d pose2d) {
-        odometry.resetPosition(pose2d, pigeon.getRotation2d());
+        poseEstimator.resetPosition(pose2d, pigeon.getRotation2d());
     }
 
     public ProfiledPIDController getThetaController() {
