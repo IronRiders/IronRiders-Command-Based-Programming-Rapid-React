@@ -41,9 +41,9 @@ public class DriveSubsystem extends SubsystemBase {
     private static PIDController yController = new PIDController(Constants.AUTO_POSITION_KP, 0, 0);
 
     private final MecanumDrivePoseEstimator poseEstimator;
-    private static final Matrix<N3, N1> stateStdDevs = VecBuilder.fill(0, 0, Units.degreesToRadians(0));
-    private static final Matrix<N1, N1> localMeasurementStdDevs = VecBuilder.fill(Units.degreesToRadians(0));
-    private static final Matrix<N3, N1> visionMeasurementStdDevs = VecBuilder.fill(0, 0, Units.degreesToRadians(0));
+    private static final Matrix<N3, N1> stateStdDevs = VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
+    private static final Matrix<N1, N1> localMeasurementStdDevs = VecBuilder.fill(Units.degreesToRadians(0.6));
+    private static final Matrix<N3, N1> visionMeasurementStdDevs = VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(20));
 
     public DriveSubsystem() {
         motors[0] = new MecanumWheel(Constants.WHEEL_PORT_FRONT_LEFT, true);
