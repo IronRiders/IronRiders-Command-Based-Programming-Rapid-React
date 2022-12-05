@@ -89,17 +89,17 @@ public class RobotContainer {
     
     public void periodic() {
            // Update pose estimator with visible targets
-           var pipelineResult = drive.camera.getLatestResult();
+           var pipelineResult = vision.camera.getLatestResult();
 
-           if (!pipelineResult.equals(drive.previousPipelineResult) && pipelineResult.hasTargets()) {
-               drive.previousPipelineResult = pipelineResult;
+           if (!pipelineResult.equals(vision.previousPipelineResult) && pipelineResult.hasTargets()) {
+               vision.previousPipelineResult = pipelineResult;
                double imageCaptureTime = Timer.getFPGATimestamp() - (pipelineResult.getLatencyMillis() / 1000d);
    
                for (PhotonTrackedTarget target : pipelineResult.getTargets()) {
    
                    var fiducialId = target.getFiducialId();
-                   if (fiducialId >= 0 && fiducialId < drive.allTargetPoses.size()) {
-                       var targetPose = drive.allTargetPoses.get(fiducialId);
+                   if (fiducialId >= 0 && fiducialId < vision.allTargetPoses.size()) {
+                       var targetPose = vision.allTargetPoses.get(fiducialId);
    
                        Transform3d camToTarget = target.getBestCameraToTarget();
                        Pose3d camPose = targetPose.transformBy(camToTarget.inverse());

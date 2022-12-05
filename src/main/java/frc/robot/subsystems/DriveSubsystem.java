@@ -1,12 +1,7 @@
 package frc.robot.subsystems;
 
-import java.util.List;
-
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 
-import org.photonvision.PhotonCamera;
-import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -14,12 +9,8 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.MecanumDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
@@ -53,11 +44,6 @@ public class DriveSubsystem extends SubsystemBase {
     private static final Matrix<N3, N1> stateStdDevs = VecBuilder.fill(0, 0, Units.degreesToRadians(0));
     private static final Matrix<N1, N1> localMeasurementStdDevs = VecBuilder.fill(Units.degreesToRadians(0));
     private static final Matrix<N3, N1> visionMeasurementStdDevs = VecBuilder.fill(0, 0, Units.degreesToRadians(0));
-    public final PhotonCamera camera = new PhotonCamera("Camera Name");
-    public PhotonPipelineResult previousPipelineResult = null;
-
-    public static final List<Pose3d> allTargetPoses = List.of(
-            new Pose3d(new Translation3d(-0.0035306, 7.578928199999999, .8858503999999999), (new Rotation3d(0, 0, 0))));
 
     public DriveSubsystem() {
         motors[0] = new MecanumWheel(Constants.WHEEL_PORT_FRONT_LEFT, true);

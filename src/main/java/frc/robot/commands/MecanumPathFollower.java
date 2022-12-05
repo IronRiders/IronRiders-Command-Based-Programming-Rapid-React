@@ -1,7 +1,5 @@
 package frc.robot.commands;
 
-import java.util.function.Supplier;
-
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPMecanumControllerCommand;
 import frc.robot.subsystems.DriveSubsystem;

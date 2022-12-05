@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonPipelineResult;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -22,10 +23,14 @@ import frc.robot.Constants;
 public class VisionSubsystem extends SubsystemBase {
     private NetworkTable table;
     private PIDController pidController;
-    private PhotonCamera camera;
+    public final PhotonCamera camera = new PhotonCamera("Camera Name");
     private AprilTagFieldLayout tagLayout;
     private List<Pose3d> targetPoses;
     private List<Pose3d> robotPoses;
+    public PhotonPipelineResult previousPipelineResult = null;
+
+    public static final List<Pose3d> allTargetPoses = List.of(
+            new Pose3d(new Translation3d(-0.0035306, 7.578928199999999, .8858503999999999), (new Rotation3d(0, 0, 0))));
 
     public VisionSubsystem() {
         table = NetworkTableInstance.getDefault().getTable("limelight");
@@ -34,7 +39,6 @@ public class VisionSubsystem extends SubsystemBase {
         pidController.setTolerance(Constants.TURN_TOLERANCE);
 
         // April Tag
-        camera = new PhotonCamera("DefaultName");
         robotPoses = new ArrayList<>();
         targetPoses = new ArrayList<>();
         try {
