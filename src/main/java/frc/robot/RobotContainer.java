@@ -8,11 +8,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.*;
 import frc.robot.commands.*;
@@ -103,23 +101,23 @@ public class RobotContainer {
 
            if (!pipelineResult.equals(vision.previousPipelineResult) && pipelineResult.hasTargets()) {
                vision.previousPipelineResult = pipelineResult;
-               double imageCaptureTime = Timer.getFPGATimestamp() - (pipelineResult.getLatencyMillis() / 1000d);
+           //    double imageCaptureTime = Timer.getFPGATimestamp() - (pipelineResult.getLatencyMillis() / 1000d);
    
                for (PhotonTrackedTarget target : pipelineResult.getTargets()) {
    
                    var fiducialId = target.getFiducialId();
                    if (fiducialId >= 0 && fiducialId < vision.allTargetPoses.size()) { 
-                       var targetPose = vision.allTargetPoses.get(fiducialId);
+                   //    var targetPose = vision.allTargetPoses.get(fiducialId);
    
                        Transform3d camToTarget = target.getBestCameraToTarget();
-                       Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
+                   //    Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
 
                        var robotToCamera = (new Transform3d(
                         new Translation3d(-Units.inchesToMeters(16), -Units.inchesToMeters(18.68),
                                 Units.inchesToMeters(18.5)),
                         new Rotation3d(0, Math.toRadians(20), Math.toRadians(180))));
    
-                       Pose3d visionMeasurement = camPose.transformBy(robotToCamera.inverse());
+                     //  Pose3d visionMeasurement = camPose.transformBy(robotToCamera.inverse());
                         chase.Update(toPose3d(drive.getPose2d()).transformBy(robotToCamera).transformBy(camToTarget));
                       // drive.getPoseEstimator().addVisionMeasurement(visionMeasurement.toPose2d(), imageCaptureTime);
                    }
