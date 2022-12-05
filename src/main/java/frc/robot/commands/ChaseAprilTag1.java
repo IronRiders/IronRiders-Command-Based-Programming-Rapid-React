@@ -6,14 +6,14 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class ChaseAprilTag extends CommandBase {
+public class ChaseAprilTag1 extends CommandBase {
 
-    private final DriveSubsystem drive;
+    //private final DriveSubsystem drive;
     Trajectory trajectory;
     MecanumPathFollower mecanumPathFollower;
 
-    public ChaseAprilTag(Trajectory trajectory, DriveSubsystem drive) {
-        this.drive = drive;
+    public ChaseAprilTag1(Trajectory trajectory, DriveSubsystem drive) {
+      //  this.drive = drive;
         this.trajectory = trajectory;
         mecanumPathFollower = new MecanumPathFollower((PathPlannerTrajectory) trajectory, drive);
 

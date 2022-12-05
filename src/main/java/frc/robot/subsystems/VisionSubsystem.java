@@ -29,7 +29,7 @@ public class VisionSubsystem extends SubsystemBase {
     private List<Pose3d> robotPoses;
     public PhotonPipelineResult previousPipelineResult = null;
 
-    public static final List<Pose3d> allTargetPoses = List.of(
+    public final List<Pose3d> allTargetPoses = List.of(
             new Pose3d(new Translation3d(-0.0035306, 7.578928199999999, .8858503999999999), (new Rotation3d(0, 0, 0))));
 
     public VisionSubsystem() {

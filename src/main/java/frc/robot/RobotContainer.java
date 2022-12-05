@@ -98,7 +98,7 @@ public class RobotContainer {
                for (PhotonTrackedTarget target : pipelineResult.getTargets()) {
    
                    var fiducialId = target.getFiducialId();
-                   if (fiducialId >= 0 && fiducialId < vision.allTargetPoses.size()) {
+                   if (fiducialId >= 0 && fiducialId < vision.allTargetPoses.size()) { 
                        var targetPose = vision.allTargetPoses.get(fiducialId);
    
                        Transform3d camToTarget = target.getBestCameraToTarget();
