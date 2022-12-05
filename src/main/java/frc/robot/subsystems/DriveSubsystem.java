@@ -196,7 +196,7 @@ public class DriveSubsystem extends SubsystemBase {
         return poseEstimator;
     }
 
-    public ChassisSpeeds getVelocity() {
+    public ChassisSpeeds getChasssisSpeeds() {
         return kinematics.toChassisSpeeds(getWheelSpeeds());
     }
 
