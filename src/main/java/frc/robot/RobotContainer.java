@@ -2,7 +2,15 @@ package frc.robot;
 
 import java.util.stream.Collectors;
 
+import org.photonvision.targeting.PhotonTrackedTarget;
+
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.*;
 import frc.robot.commands.*;
@@ -77,4 +85,33 @@ public class RobotContainer {
         double exponent = SmartDashboard.getNumber("exponent", Constants.EXPONENT) + 1;
         return Math.pow(Math.abs(deadbanded), exponent) * Math.signum(deadbanded);
     }
+
+    
+    public void periodic() {
+           // Update pose estimator with visible targets
+           var pipelineResult = drive.camera.getLatestResult();
+
+           if (!pipelineResult.equals(drive.previousPipelineResult) && pipelineResult.hasTargets()) {
+               drive.previousPipelineResult = pipelineResult;
+               double imageCaptureTime = Timer.getFPGATimestamp() - (pipelineResult.getLatencyMillis() / 1000d);
+   
+               for (PhotonTrackedTarget target : pipelineResult.getTargets()) {
+   
+                   var fiducialId = target.getFiducialId();
+                   if (fiducialId >= 0 && fiducialId < drive.allTargetPoses.size()) {
+                       var targetPose = drive.allTargetPoses.get(fiducialId);
+   
+                       Transform3d camToTarget = target.getBestCameraToTarget();
+                       Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
+   
+                       Pose3d visionMeasurement = camPose.transformBy(new Transform3d(
+                               new Translation3d(-Units.inchesToMeters(16), -Units.inchesToMeters(18.68),
+                                       Units.inchesToMeters(18.5)),
+                               new Rotation3d(0, Math.toRadians(20), Math.toRadians(180))));
+                       drive.getPoseEstimator().addVisionMeasurement(visionMeasurement.toPose2d(), imageCaptureTime);
+                   }
+               }
+           }
+
+        }
 }

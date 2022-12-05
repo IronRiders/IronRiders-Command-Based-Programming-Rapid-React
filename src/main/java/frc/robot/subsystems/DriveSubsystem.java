@@ -42,9 +42,10 @@ public class DriveSubsystem extends SubsystemBase {
     private final MecanumDriveKinematics kinematics;
     private final WPI_Pigeon2 pigeon;
     public Field2d field;
-    private static ProfiledPIDController thetaController = new ProfiledPIDController(Constants.AUTO_THETACONTROLLER_KP,
+    private static ProfiledPIDController profiledThetaController = new ProfiledPIDController(Constants.AUTO_THETACONTROLLER_KP,
             0, 0,
             new TrapezoidProfile.Constraints(Units.rotationsToRadians(0.75), Units.rotationsToRadians(1.5)));
+    private static PIDController thetaController = new PIDController(profiledThetaController.getP(), profiledThetaController.getI(), profiledThetaController.getD());       
     private static PIDController xController = new PIDController(Constants.AUTO_POSITION_KP, 0, 0);
     private static PIDController yController = new PIDController(Constants.AUTO_POSITION_KP, 0, 0);
 
@@ -52,10 +53,10 @@ public class DriveSubsystem extends SubsystemBase {
     private static final Matrix<N3, N1> stateStdDevs = VecBuilder.fill(0, 0, Units.degreesToRadians(0));
     private static final Matrix<N1, N1> localMeasurementStdDevs = VecBuilder.fill(Units.degreesToRadians(0));
     private static final Matrix<N3, N1> visionMeasurementStdDevs = VecBuilder.fill(0, 0, Units.degreesToRadians(0));
-    private final PhotonCamera camera = new PhotonCamera("Camera Name");
-    private PhotonPipelineResult previousPipelineResult = null;
+    public final PhotonCamera camera = new PhotonCamera("Camera Name");
+    public PhotonPipelineResult previousPipelineResult = null;
 
-    private static final List<Pose3d> allTargetPoses = List.of(
+    public static final List<Pose3d> allTargetPoses = List.of(
             new Pose3d(new Translation3d(-0.0035306, 7.578928199999999, .8858503999999999), (new Rotation3d(0, 0, 0))));
 
     public DriveSubsystem() {
@@ -74,7 +75,7 @@ public class DriveSubsystem extends SubsystemBase {
 
         pigeon = new WPI_Pigeon2(15);
         targetChassisSpeeds = new ChassisSpeeds();
-        thetaController.enableContinuousInput(-Math.PI, Math.PI); // For more efficiency when turning.
+        profiledThetaController.enableContinuousInput(-Math.PI, Math.PI); // For more efficiency when turning.
         field = new Field2d();
 
         poseEstimator = new MecanumDrivePoseEstimator(
@@ -98,30 +99,6 @@ public class DriveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-
-        // Update pose estimator with visible targets
-        var pipelineResult = camera.getLatestResult();
-
-        if (!pipelineResult.equals(previousPipelineResult) && pipelineResult.hasTargets()) {
-            previousPipelineResult = pipelineResult;
-            double imageCaptureTime = Timer.getFPGATimestamp() - (pipelineResult.getLatencyMillis() / 1000d);
-
-            for (PhotonTrackedTarget target : pipelineResult.getTargets()) {
-
-                var fiducialId = target.getFiducialId();
-                if (fiducialId >= 0 && fiducialId < allTargetPoses.size()) {
-                    var targetPose = allTargetPoses.get(fiducialId);
-
-                    Transform3d camToTarget = target.getBestCameraToTarget();
-                    Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
-
-                    Pose3d visionMeasurement = camPose.transformBy(new Transform3d(
-                            new Translation3d(-Units.inchesToMeters(16), -Units.inchesToMeters(18.68),
-                                    Units.inchesToMeters(18.5)),
-                            new Rotation3d(0, Math.toRadians(20), Math.toRadians(180))));
-                    poseEstimator.addVisionMeasurement(visionMeasurement.toPose2d(), imageCaptureTime);
-                }
-            }
             // Update pose estimator with drivetrain sensors
             poseEstimator.updateWithTime(
                     Timer.getFPGATimestamp(),
@@ -129,7 +106,6 @@ public class DriveSubsystem extends SubsystemBase {
                     getWheelSpeeds());
 
             field.setRobotPose(getPose2d());
-        }
 
         // Tuning
         NetworkTableInstance.getDefault().flush();
@@ -139,7 +115,7 @@ public class DriveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Y controller", getPose2d().getY());
         SmartDashboard.putNumber("y Controller (target)", yController.getSetpoint());
         SmartDashboard.putNumber("Theta controller (Degrees)", getPose2d().getRotation().getDegrees());
-        SmartDashboard.putNumber("Theta setPoint (Target))", Math.toDegrees(thetaController.getSetpoint().position));
+        SmartDashboard.putNumber("Theta setPoint (Target))", Math.toDegrees(profiledThetaController.getSetpoint().position));
 
         ActualChassisSpeeds = kinematics.toChassisSpeeds(getWheelSpeeds());
 
@@ -157,7 +133,7 @@ public class DriveSubsystem extends SubsystemBase {
                 new Pose2d(
                         xController.getSetpoint(),
                         yController.getSetpoint(),
-                        new Rotation2d(thetaController.getSetpoint().position)));
+                        new Rotation2d(profiledThetaController.getSetpoint().position)));
     }
 
     public Pose2d getPose2d() {
@@ -214,7 +190,11 @@ public class DriveSubsystem extends SubsystemBase {
         poseEstimator.resetPosition(pose2d, pigeon.getRotation2d());
     }
 
-    public ProfiledPIDController getThetaController() {
+    public ProfiledPIDController getProfiledThetaController() {
+        return profiledThetaController;
+    }
+
+    public PIDController getThetaController() {
         return thetaController;
     }
 
@@ -224,5 +204,9 @@ public class DriveSubsystem extends SubsystemBase {
 
     public PIDController getyController() {
         return yController;
+    }
+
+    public MecanumDrivePoseEstimator getPoseEstimator() {
+        return poseEstimator;
     }
 }
