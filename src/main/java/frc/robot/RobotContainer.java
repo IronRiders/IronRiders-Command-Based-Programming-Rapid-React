@@ -98,7 +98,7 @@ public class RobotContainer {
     public void periodic() {
            // Update pose estimator with visible targets
            var pipelineResult = vision.camera.getLatestResult();
-
+           System.out.print(pipelineResult);
            if (!pipelineResult.equals(vision.previousPipelineResult) && pipelineResult.hasTargets()) {
                vision.previousPipelineResult = pipelineResult;
            //    double imageCaptureTime = Timer.getFPGATimestamp() - (pipelineResult.getLatencyMillis() / 1000d);
@@ -122,7 +122,6 @@ public class RobotContainer {
                       // drive.getPoseEstimator().addVisionMeasurement(visionMeasurement.toPose2d(), imageCaptureTime);
                    }
                }
-               periodic();
            }
 
         }

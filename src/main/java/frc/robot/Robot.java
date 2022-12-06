@@ -13,12 +13,12 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         robotContainer = new RobotContainer();
         robotContainer.traj();
-        robotContainer.periodic();
     }
 
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
+        robotContainer.periodic();
     }
 
     @Override

@@ -23,7 +23,7 @@ import frc.robot.Constants;
 public class VisionSubsystem extends SubsystemBase {
     private NetworkTable table;
     private PIDController pidController;
-    public final PhotonCamera camera = new PhotonCamera("Camera Name");
+    public final PhotonCamera camera = new PhotonCamera("Anish");
     private AprilTagFieldLayout tagLayout;
     private List<Pose3d> targetPoses;
     private List<Pose3d> robotPoses;
