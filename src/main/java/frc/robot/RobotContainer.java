@@ -38,7 +38,7 @@ public class RobotContainer {
                                 new RunCommand(() -> drive.setChassisSpeeds(joystickResponse(controller.getRawAxis(0)),
                                                 joystickResponse(controller.getRawAxis(1)),
                                                 joystickResponse(controller.getRawAxis(3)), true), drive));
-                shooter.setDefaultCommand(new RunCommand(() -> shooter.shoot(50), shooter));
+               // shooter.setDefaultCommand(new RunCommand(() -> shooter.shoot(50), shooter));
 
                 new JoystickButton(controller, 1)
                                 .whenHeld(new ShooterTeleop(shooter, indexer, vision, drive));
@@ -122,6 +122,7 @@ public class RobotContainer {
                       // drive.getPoseEstimator().addVisionMeasurement(visionMeasurement.toPose2d(), imageCaptureTime);
                    }
                }
+               periodic();
            }
 
         }
