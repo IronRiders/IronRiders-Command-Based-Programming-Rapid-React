@@ -46,7 +46,7 @@ public class ChaseAprilTag {
             var finalPoint = new PathPoint(finalPose.getTranslation(), finalHeading, finalHolRot);
 
             PathPlannerTrajectory trajectory = PathPlanner.generatePath(
-                    new PathConstraints(2, 2), initialPoint, finalPoint);
+                    new PathConstraints(1, 1), initialPoint, finalPoint);
 
             new MecanumPathFollower(trajectory, drive).schedule();
 
