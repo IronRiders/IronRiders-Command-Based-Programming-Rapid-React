@@ -54,6 +54,7 @@ public final class Constants {
     public static final int INDEXER_SERVO_PORT = 0;
     public static final int CLIMBER_PORT_1 = 9;
     public static final int CLIMBER_PORT_2 = 10;
+    public static final int PIGEON_PORT = 15;
 
     // Vision
     public static final double VISION_CAMERA_ANGLE = 20;

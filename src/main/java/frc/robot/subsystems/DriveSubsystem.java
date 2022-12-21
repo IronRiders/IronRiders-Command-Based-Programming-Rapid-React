@@ -2,7 +2,9 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.ctre.phoenix.sensors.Pigeon2;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
@@ -16,6 +18,7 @@ public class DriveSubsystem extends SubsystemBase {
     private CANSparkMax[] motors;
 
     private final MecanumDriveKinematics kinematics;
+    private final Pigeon2 pigeon;
 
     public  DriveSubsystem() {
         this.motors = new CANSparkMax[4];
@@ -39,6 +42,8 @@ public class DriveSubsystem extends SubsystemBase {
         motors[1].setIdleMode(IdleMode.kBrake);
         motors[2].setIdleMode(IdleMode.kBrake);
         motors[3].setIdleMode(IdleMode.kBrake);
+
+        pigeon = new Pigeon2(Constants.PIGEON_PORT);
         
         // meter per second
         kinematics = new MecanumDriveKinematics(
@@ -68,7 +73,10 @@ public class DriveSubsystem extends SubsystemBase {
             ySpeed = -ySpeed;
         }
 
-        ChassisSpeeds chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, turn * -Constants.TURN_SPEED);
+//        ChassisSpeeds chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, turn * -Constants.TURN_SPEED);
+        // Field Relative ChassisSpeeds
+        double robotYaw = pigeon.getYaw();
+        ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, turn * -Constants.TURN_SPEED, Rotation2d.fromDegrees(robotYaw));
         MecanumDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds); 
 
         this.motors[0].set(wheelSpeeds.frontLeftMetersPerSecond * Constants.DRIVE_SPEED_MULT / Constants.MOVEMENT_SPEED);
