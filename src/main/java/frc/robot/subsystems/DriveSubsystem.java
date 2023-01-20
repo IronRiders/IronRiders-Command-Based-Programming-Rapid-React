@@ -3,11 +3,13 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.math.geometry.Translation2d;
+
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
-import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants; 
 
@@ -15,7 +17,7 @@ public class DriveSubsystem extends SubsystemBase {
     private boolean inverted;
     private CANSparkMax[] motors;
 
-    private final MecanumDriveKinematics kinematics;
+    private final DifferentialDriveKinematics kinematics;
 
     public  DriveSubsystem() {
         this.motors = new CANSparkMax[4];
@@ -41,11 +43,7 @@ public class DriveSubsystem extends SubsystemBase {
         motors[3].setIdleMode(IdleMode.kBrake);
         
         // meter per second
-        kinematics = new MecanumDriveKinematics(
-            new Translation2d(0.28575, 0.2267), 
-            new Translation2d(0.28575, -0.2267),
-            new Translation2d(-0.28575, 0.2267), 
-            new Translation2d(-0.28575, -0.2267));
+        kinematics = new DifferentialDriveKinematics(0.5715);
     }
 
     public void invertDrive() {
@@ -62,19 +60,23 @@ public class DriveSubsystem extends SubsystemBase {
 
     public void updateSpeed(double strafe, double drive, double turn, boolean useInverted) {
         double xSpeed = drive * Constants.MOVEMENT_SPEED;
-        double ySpeed = strafe * Constants.MOVEMENT_SPEED;
         if (useInverted && inverted) {
             xSpeed = -xSpeed;
-            ySpeed = -ySpeed;
         }
 
-        ChassisSpeeds chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, turn * -Constants.TURN_SPEED);
-        MecanumDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds); 
+        ChassisSpeeds chassisSpeeds = new ChassisSpeeds(xSpeed, 0, turn * -Constants.TURN_SPEED);
+        DifferentialDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds); 
 
-        this.motors[0].set(wheelSpeeds.frontLeftMetersPerSecond * Constants.DRIVE_SPEED_MULT / Constants.MOVEMENT_SPEED);
-        this.motors[1].set(wheelSpeeds.frontRightMetersPerSecond * Constants.DRIVE_SPEED_MULT / Constants.MOVEMENT_SPEED);
-        this.motors[2].set(wheelSpeeds.rearLeftMetersPerSecond * Constants.DRIVE_SPEED_MULT / Constants.MOVEMENT_SPEED);
-        this.motors[3].set(wheelSpeeds.rearRightMetersPerSecond * Constants.DRIVE_SPEED_MULT / Constants.MOVEMENT_SPEED);
+        double leftVelocity = wheelSpeeds.leftMetersPerSecond;
+
+        double rightVelocity = wheelSpeeds.rightMetersPerSecond;
+
+        MotorControllerGroup leftMotor = new MotorControllerGroup(this.motors[0], this.motors[2]);
+
+        MotorControllerGroup rightMotor = new MotorControllerGroup(this.motors[1], this.motors[3]);
+
+       leftMotor.set(leftVelocity);
+       rightMotor.set(rightVelocity);
     }
 
     public void stop() {

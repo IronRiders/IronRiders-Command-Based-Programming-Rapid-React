@@ -19,9 +19,9 @@ public class ShooterTeleop extends SequentialCommandGroup {
             CommandFactory.runIndexerCommand(indexer));
     }
 
-    @Override
-    public void end(boolean interrupted) {
-        shooter.stop();
-        indexer.retract();
-    }
+    // @Override
+    // public void end(boolean interrupted) {
+    //     shooter.stop();
+    //     indexer.retract();
+    // }
 }
