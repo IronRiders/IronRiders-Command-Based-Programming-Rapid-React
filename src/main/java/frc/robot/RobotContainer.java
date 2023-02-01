@@ -20,7 +20,7 @@ public class RobotContainer {
     public RobotContainer() {
         // Drive
         drive.setDefaultCommand(new RunCommand(() -> drive.updateSpeed(joystickResponse(controller.getRawAxis(0)),
-                joystickResponse(controller.getRawAxis(1)), joystickResponse(controller.getRawAxis(3)), true), drive));
+                joystickResponse(controller.getRawAxis(1)), joystickResponse(controller.getRawAxis(2)), true), drive));
 
         shooter.setDefaultCommand(new RunCommand(() -> shooter.shoot(50), shooter));
 
